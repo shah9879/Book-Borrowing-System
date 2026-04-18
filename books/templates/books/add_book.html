@@ -1,72 +1,94 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}Add a New Book | BookShare{% endblock %}
 
-<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <h2>📚 Add a New Book</h2>
-    
-    <!-- enctype="multipart/form-data" is REQUIRED for file uploads -->
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <!-- Display form fields with better styling -->
-        <div style="margin-bottom: 20px;">
-            {{ form.as_p }}
-        </div>
-        
-        <!-- Instructions for images -->
-        <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
-            <strong>📸 Book Cover:</strong>
-            <ul style="margin: 10px 0; padding-left: 20px;">
-                <li>You can <strong>upload an image</strong> from your computer (recommended)</li>
-                <li><strong>OR</strong> paste an image URL from the internet</li>
-                <li>If you provide both, the uploaded image will be used</li>
-            </ul>
-        </div>
-        
-        <!-- Submit Button -->
-        <button type="submit" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">
-            ✓ Save Book
-        </button>
-    </form>
-    
-    <br>
-    <a href="{% url 'browse_books' %}">← Back to Browse</a>
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-8 text-center md:text-left">
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">List a New Book</h1>
+        <p class="text-slate-500 mt-2 font-medium">Fill out the details below to share your book with the community.</p>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+        <form method="POST" enctype="multipart/form-data" class="p-8 md:p-12">
+            {% csrf_token %}
+
+            <div class="space-y-8">
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="django-form-wrapper">
+                        {{ form.as_p }}
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 flex gap-4">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
+                        <i class="fa-solid fa-camera-retro"></i>
+                    </div>
+                    <div class="text-sm">
+                        <h4 class="font-bold text-emerald-900 mb-1">Book Cover Tip</h4>
+                        <p class="text-emerald-700 leading-relaxed">
+                            You can <strong>upload a file</strong> or paste an <strong>image URL</strong>. 
+                            If both are provided, your uploaded file will take priority.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-4">
+                    <button type="submit" 
+                            class="w-full sm:w-auto bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-emerald-200 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-check"></i>
+                        Save & List Book
+                    </button>
+                    <a href="{% url 'browse_books' %}" class="text-slate-400 font-bold hover:text-slate-600 transition-colors">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <style>
-    /* Style the form fields */
-    input[type="text"], 
-    input[type="url"], 
-    input[type="file"], 
-    textarea, 
-    select {
+    /* Targeting the tags Django generates with .as_p */
+    .django-form-wrapper p {
+        margin-bottom: 1.5rem;
+    }
+
+    .django-form-wrapper label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #1e293b; /* slate-800 */
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .django-form-wrapper input[type="text"],
+    .django-form-wrapper input[type="url"],
+    .django-form-wrapper input[type="number"],
+    .django-form-wrapper textarea,
+    .django-form-wrapper select {
         width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
+        padding: 0.875rem 1rem;
+        background-color: #f8fafc; /* slate-50 */
+        border: 1px solid #e2e8f0; /* slate-200 */
+        border-radius: 1rem;
+        font-size: 1rem;
+        transition: all 0.2s;
+        outline: none;
     }
-    
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #333;
+
+    .django-form-wrapper input:focus, 
+    .django-form-wrapper textarea:focus, 
+    .django-form-wrapper select:focus {
+        background-color: white;
+        border-color: #10b981; /* emerald-500 */
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
     }
-    
-    .helptext {
-        display: block;
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
-    }
-    
-    /* Style the file input */
-    input[type="file"] {
-        padding: 8px;
-        background: #f9f9f9;
+
+    .django-form-wrapper textarea {
+        min-height: 120px;
     }
 </style>
-
 {% endblock %}

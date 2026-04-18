@@ -1,15 +1,97 @@
 {% extends 'base.html' %}
-{% block content %}
-<h2>My Books</h2>
+{% block title %}My Bookshelf | BookShare{% endblock %}
 
-{% for book in books %}
-    <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-        <h3>{{ book.title }}</h3>
-        <p><strong>Author:</strong> {{ book.author }}</p>
-        <p><strong>City:</strong> {{ book.city }}</p>
-        <p><strong>Available:</strong> {{ book.available }}</p>
+{% block content %}
+<div class="space-y-8">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">My Bookshelf</h1>
+            <p class="text-slate-500 mt-1 font-medium">You have listed <span class="text-emerald-600 font-bold">{{ books|length }}</span> books for the community.</p>
+        </div>
+        <a href="{% url 'add_book' %}" class="bg-emerald-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-emerald-700 hover:scale-105 transition-all shadow-lg shadow-emerald-100 flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            Add New Book
+        </a>
     </div>
-{% empty %}
-    <p>You haven't added any books yet.</p>
-{% endfor %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for book in books %}
+        <div class="bg-white rounded-[2rem] border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+            
+            <div class="p-6 flex gap-4">
+                <div class="w-20 h-28 bg-slate-100 rounded-xl overflow-hidden shadow-sm shrink-0 border border-slate-200">
+                    {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" class="w-full h-full object-cover">
+                    {% elif book.cover_url %}
+                        <img src="{{ book.cover_url }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-slate-300">
+                            <i class="fa-solid fa-book"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="flex flex-col justify-center overflow-hidden">
+                    <h3 class="text-lg font-extrabold text-slate-900 truncate" title="{{ book.title }}">{{ book.title }}</h3>
+                    <p class="text-sm text-slate-500 font-medium truncate">{{ book.author }}</p>
+                    
+                    <div class="mt-3">
+                        {% if book.available %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100">
+                                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                Available
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-100">
+                                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                                Currently Borrowed
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-3 bg-slate-50 border-y border-slate-100 flex justify-between items-center text-xs text-slate-400 font-bold uppercase tracking-wider">
+                <span class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-location-dot text-emerald-500"></i> {{ book.city }}
+                </span>
+                <span>
+                    {{ book.get_delivery_option_display }}
+                </span>
+            </div>
+
+            <div class="p-4 grid grid-cols-2 gap-2">
+                <a href="{% url 'book_detail' book.id %}" class="flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors">
+                    <i class="fa-solid fa-eye text-[10px]"></i> View
+                </a>
+                <a href="{% url 'edit_book' book.id %}" class="flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors">
+                    <i class="fa-solid fa-pen text-[10px]"></i> Edit
+                </a>
+                
+                {% if not book.available %}
+                    <a href="{% url 'return_book' book.id %}" class="col-span-2 flex items-center justify-center gap-2 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all shadow-md shadow-emerald-100">
+                        <i class="fa-solid fa-rotate-left"></i> Mark as Returned
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'delete_book' book.id %}" class="col-span-2 flex items-center justify-center gap-2 py-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    <i class="fa-solid fa-trash-can"></i> Delete Listing
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-50 rounded-full mb-6">
+                <i class="fa-solid fa-books text-3xl text-slate-200"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800">Your shelf is empty</h2>
+            <p class="text-slate-500 mt-2 max-w-xs mx-auto">Start sharing with your organization by adding your first book today.</p>
+            <a href="{% url 'add_book' %}" class="mt-8 inline-flex items-center gap-3 bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100">
+                <i class="fa-solid fa-plus"></i>
+                List Your First Book
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

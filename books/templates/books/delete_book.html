@@ -1,32 +1,63 @@
 {% extends 'base.html' %}
+{% block title %}Confirm Deletion | BookShare{% endblock %}
+
 {% block content %}
-
-<div style="max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #f44336;">
-    <h2 style="color: #f44336;">⚠️ Delete Book</h2>
-    
-    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 20px 0;">
-        <p style="margin: 0;"><strong>Warning:</strong> This action cannot be undone!</p>
-    </div>
-    
-    <p style="font-size: 16px; margin: 20px 0;">
-        Are you sure you want to delete <strong>"{{ book.title }}"</strong> by {{ book.author }}?
-    </p>
-    
-    {% if book.cover_image %}
-        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="max-width: 150px; border-radius: 5px; margin: 10px 0;">
-    {% endif %}
-    
-    <form method="POST" style="margin-top: 20px;">
-        {% csrf_token %}
-        <div style="display: flex; gap: 10px;">
-            <button type="submit" style="flex: 1; padding: 12px; background: #f44336; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-                🗑️ Yes, Delete
-            </button>
-            <a href="{% url 'my_books' %}" style="flex: 1; padding: 12px; background: #9E9E9E; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                Cancel
-            </a>
+<div class="max-w-xl mx-auto py-12 px-4">
+    <div class="bg-white rounded-[2.5rem] border-2 border-red-100 shadow-2xl overflow-hidden">
+        
+        <div class="bg-red-50 p-8 text-center border-b border-red-100 relative">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-red-500"></div>
+            
+            <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-red-500 mx-auto mb-4 shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-red-900 tracking-tight">Delete Book</h2>
         </div>
-    </form>
-</div>
 
+        <div class="p-8 md:p-10">
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl mb-8 flex items-start gap-3">
+                <i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5"></i>
+                <p class="text-sm font-bold text-amber-900 leading-tight">
+                    Warning: This action cannot be undone!
+                </p>
+            </div>
+
+            <div class="text-center mb-8">
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    Are you sure you want to delete <br>
+                    <strong class="text-slate-900 text-xl font-black italic">"{{ book.title }}"</strong> <br>
+                    <span class="text-slate-500 font-medium">by {{ book.author }}?</span>
+                </p>
+            </div>
+
+            {% if book.cover_image or book.cover_url %}
+            <div class="flex justify-center mb-8">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-red-100 rounded-xl blur opacity-30"></div>
+                    <div class="relative w-36 aspect-[3/4] bg-slate-50 rounded-lg overflow-hidden border border-slate-200 shadow-lg">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" class="flex flex-col sm:flex-row gap-4">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="flex-1 bg-red-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-red-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-red-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Yes, Delete
+                </button>
+                <a href="{% url 'my_books' %}" 
+                   class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold text-center hover:bg-slate-200 hover:text-slate-700 transition-all">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,68 +1,99 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}Books I'm Borrowing | BookShare{% endblock %}
 
-<div style="max-width: 1200px; margin: 0 auto;">
-    <h2>📖 Books I'm Borrowing</h2>
-    
-    <p style="color: #666; margin-bottom: 20px;">
-        You are currently borrowing <strong>{{ borrowed_list|length }}</strong> book(s)
-    </p>
-    
-    <!-- Books Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-        {% for item in borrowed_list %}
-        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            
-            <!-- Book Cover -->
-            <div style="width: 100%; height: 200px; background: #f0f0f0; border-radius: 5px; overflow: hidden; margin-bottom: 15px;">
-                {% if item.book.cover_image %}
-                    <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.title }}" style="width: 100%; height: 100%; object-fit: contain;">
-                {% elif item.book.cover_url %}
-                    <img src="{{ item.book.cover_url }}" alt="{{ item.book.title }}" style="width: 100%; height: 100%; object-fit: contain;">
-                {% else %}
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                        <span style="font-size: 60px;">📖</span>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <!-- Book Details -->
-            <h3 style="margin: 0 0 10px 0;">{{ item.book.title }}</h3>
-            <p style="margin: 5px 0; color: #666;"><strong>Author:</strong> {{ item.book.author }}</p>
-            <p style="margin: 5px 0; color: #666;"><strong>Owner:</strong> 👤 {{ item.owner.username }}</p>
-            <p style="margin: 5px 0; color: #666;"><strong>City:</strong> 📍 {{ item.book.city }}</p>
-            
-            <!-- Status Badge -->
-            <p style="margin: 10px 0;">
-                {% if item.book.available %}
-                    <span style="background: #4CAF50; color: white; padding: 5px 12px; border-radius: 5px; font-size: 13px;">✓ Available to Return</span>
-                {% else %}
-                    <span style="background: #FF9800; color: white; padding: 5px 12px; border-radius: 5px; font-size: 13px;">📚 Currently Borrowed</span>
-                {% endif %}
+{% block content %}
+<div class="space-y-8">
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Active Borrows</h1>
+            <p class="text-slate-500 mt-1 font-medium">
+                You are currently enjoying <span class="text-blue-600 font-bold">{{ borrowed_list|length }}</span> shared book(s).
             </p>
+        </div>
+        <div class="hidden md:block">
+            <i class="fa-solid fa-hand-holding-heart text-4xl text-slate-100"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for item in borrowed_list %}
+        <div class="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
             
-            <!-- Action Buttons -->
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <div class="p-6">
+                <div class="flex gap-6">
+                    <div class="w-24 h-32 bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shrink-0 shadow-inner">
+                        {% if item.book.cover_image %}
+                            <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.title }}" class="w-full h-full object-cover">
+                        {% elif item.book.cover_url %}
+                            <img src="{{ item.book.cover_url }}" alt="{{ item.book.title }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-slate-200">
+                                <i class="fa-solid fa-book-open text-2xl"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex flex-col justify-center py-1">
+                        <h3 class="text-lg font-black text-slate-900 leading-tight mb-1">{{ item.book.title }}</h3>
+                        <p class="text-sm font-bold text-slate-400 mb-3">by {{ item.book.author }}</p>
+                        
+                        <div class="flex flex-col gap-2">
+                            <span class="inline-flex items-center gap-2 text-xs font-bold text-slate-600">
+                                <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px]">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                {{ item.owner.username }}
+                            </span>
+                            <span class="inline-flex items-center gap-2 text-xs font-bold text-slate-400">
+                                <i class="fa-solid fa-location-dot w-5 text-center text-emerald-500"></i>
+                                {{ item.book.city }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Current Status</span>
+                    {% if item.book.available %}
+                        <span class="text-[11px] font-black text-emerald-600 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Ready to Return
+                        </span>
+                    {% else %}
+                        <span class="text-[11px] font-black text-blue-600 flex items-center gap-1.5">
+                            <i class="fa-solid fa-bookmark"></i> In Your Care
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="px-6 pb-6 pt-2 flex flex-col gap-3">
                 <a href="{% url 'chat_detail' item.chat.id %}" 
-                   style="flex: 1; text-align: center; padding: 10px; background: #2196F3; color: white; text-decoration: none; border-radius: 5px;">
-                    💬 Message Owner
+                   class="w-full flex items-center justify-center gap-3 py-3.5 bg-white border-2 border-slate-100 text-slate-700 rounded-2xl font-bold hover:bg-slate-50 hover:border-blue-200 transition-all">
+                    <i class="fa-solid fa-comment-dots text-blue-500"></i>
+                    Message Owner
                 </a>
+                
                 <a href="{% url 'return_book' item.book.id %}" 
-                   style="flex: 1; text-align: center; padding: 10px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
-                    ↩️ Mark as Returned
+                   class="w-full flex items-center justify-center gap-3 py-3.5 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-100">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Mark as Returned
                 </a>
             </div>
         </div>
         {% empty %}
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 8px;">
-            <p style="font-size: 18px; color: #666;">📚 You're not borrowing any books currently.</p>
+        <div class="col-span-full py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-50 rounded-full mb-6">
+                <i class="fa-solid fa-ghost text-3xl text-slate-200"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800">No active borrows</h2>
+            <p class="text-slate-500 mt-2 max-w-xs mx-auto">Your library card is looking a bit lonely. Go find a great read!</p>
             <a href="{% url 'browse_books' %}" 
-               style="display: inline-block; margin-top: 15px; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
-                Browse Books
+               class="mt-8 inline-flex items-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-100">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Browse the Library
             </a>
         </div>
         {% endfor %}
     </div>
 </div>
-
 {% endblock %}

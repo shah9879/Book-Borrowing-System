@@ -1,101 +1,99 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}My Profile | BookShare{% endblock %}
 
-<div style="max-width: 1000px; margin: 0 auto;">
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-8">
     
-    <!-- Profile Header -->
-    <div style="background: white; border-radius: 8px; padding: 30px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div>
-                <h2 style="margin: 0 0 10px 0;">👤 {{ request.user.username }}</h2>
-                {% if request.user.first_name %}
-                    <p style="font-size: 18px; color: #666; margin: 5px 0;">{{ request.user.first_name }} {{ request.user.last_name }}</p>
-                {% endif %}
-                <p style="color: #666; margin: 5px 0;">📧 {{ request.user.email }}</p>
-                {% if request.user.profile.city %}
-                    <p style="color: #666; margin: 5px 0;">📍 {{ request.user.profile.city }}</p>
-                {% endif %}
-                <p style="color: #999; margin-top: 10px; font-size: 14px;">Member since {{ request.user.date_joined|date:"M Y" }}</p>
+    <div class="bg-white rounded-[2.5rem] p-8 md:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[5rem] -z-0"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div class="flex items-center gap-6">
+                <div class="w-24 h-24 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-3xl flex items-center justify-center text-white text-4xl shadow-lg shadow-emerald-100">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                
+                <div>
+                    <h1 class="text-3xl font-black text-slate-900 tracking-tight">
+                        {{ request.user.username }}
+                    </h1>
+                    <div class="flex flex-wrap gap-4 mt-2 text-sm font-bold text-slate-500">
+                        {% if request.user.first_name %}
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-id-card text-emerald-500"></i> {{ request.user.get_full_name }}</span>
+                        {% endif %}
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-envelope text-emerald-500"></i> {{ request.user.email }}</span>
+                        {% if request.user.profile.city %}
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-emerald-500"></i> {{ request.user.profile.city }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-[10px] uppercase tracking-[0.2em] font-black text-slate-300 mt-4">Member Since {{ request.user.date_joined|date:"M Y" }}</p>
+                </div>
             </div>
-            <a href="{% url 'profile_edit' %}" 
-               style="background: #FF9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                ✏️ Edit Profile
+            
+            <a href="{% url 'profile_edit' %}" class="bg-white border-2 border-slate-100 hover:border-amber-400 text-slate-600 hover:text-amber-600 px-6 py-3 rounded-2xl font-black transition-all flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Edit Profile
             </a>
         </div>
     </div>
-    
-    <!-- Statistics -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
-        <div style="background: #4CAF50; color: white; padding: 20px; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 36px;">{{ my_books|length }}</h3>
-            <p style="margin: 5px 0;">Books Owned</p>
-        </div>
-        <div style="background: #2196F3; color: white; padding: 20px; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 36px;">{{ borrowed_books|length }}</h3>
-            <p style="margin: 5px 0;">Currently Borrowing</p>
-        </div>
-        <div style="background: #FF9800; color: white; padding: 20px; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 36px;">{{ lent_books|length }}</h3>
-            <p style="margin: 5px 0;">Currently Lent Out</p>
-        </div>
-    </div>
-    
-    <!-- My Books Section -->
-    <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <h3>📚 My Books ({{ my_books|length }})</h3>
-        {% if my_books %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
-                {% for book in my_books %}
-                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;">
-                    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; text-align: center;">
-                        {% if book.cover_image %}
-                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px;">
-                        {% else %}
-                            <div style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 5px; margin-bottom: 10px;">
-                                <span style="font-size: 40px;">📖</span>
-                            </div>
-                        {% endif %}
-                        <p style="margin: 0; font-size: 14px; font-weight: bold;">{{ book.title|truncatewords:3 }}</p>
-                        {% if not book.available %}
-                            <span style="background: #f44336; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Lent Out</span>
-                        {% endif %}
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p style="color: #999;">You haven't added any books yet.</p>
-            <a href="{% url 'add_book' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Add Your First Book</a>
-        {% endif %}
-    </div>
-    
-    <!-- Currently Borrowing Section -->
-    <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <h3>📖 Currently Borrowing ({{ borrowed_books|length }})</h3>
-        {% if borrowed_books %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
-                {% for book in borrowed_books %}
-                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;">
-                    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; text-align: center;">
-                        {% if book.cover_image %}
-                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px;">
-                        {% else %}
-                            <div style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 5px; margin-bottom: 10px;">
-                                <span style="font-size: 40px;">📖</span>
-                            </div>
-                        {% endif %}
-                        <p style="margin: 0; font-size: 14px; font-weight: bold;">{{ book.title|truncatewords:3 }}</p>
-                        <p style="margin: 5px 0; font-size: 12px; color: #666;">by {{ book.owner.username }}</p>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p style="color: #999;">You're not borrowing any books currently.</p>
-            <a href="{% url 'browse_books' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Browse Books</a>
-        {% endif %}
-    </div>
-    
-</div>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-emerald-600 p-8 rounded-[2rem] text-white shadow-xl shadow-emerald-100 relative overflow-hidden group">
+            <i class="fa-solid fa-book absolute -right-4 -bottom-4 text-7xl opacity-10 group-hover:scale-110 transition-transform"></i>
+            <h3 class="text-5xl font-black mb-1">{{ my_books|length }}</h3>
+            <p class="text-emerald-100 font-bold uppercase tracking-widest text-xs">Books Owned</p>
+        </div>
+        
+        <div class="bg-blue-600 p-8 rounded-[2rem] text-white shadow-xl shadow-blue-100 relative overflow-hidden group">
+            <i class="fa-solid fa-hand-holding-heart absolute -right-4 -bottom-4 text-7xl opacity-10 group-hover:scale-110 transition-transform"></i>
+            <h3 class="text-5xl font-black mb-1">{{ borrowed_books|length }}</h3>
+            <p class="text-blue-100 font-bold uppercase tracking-widest text-xs">Currently Borrowing</p>
+        </div>
+
+        <div class="bg-amber-500 p-8 rounded-[2rem] text-white shadow-xl shadow-amber-100 relative overflow-hidden group">
+            <i class="fa-solid fa-share-from-square absolute -right-4 -bottom-4 text-7xl opacity-10 group-hover:scale-110 transition-transform"></i>
+            <h3 class="text-5xl font-black mb-1">{{ lent_books|length }}</h3>
+            <p class="text-amber-50 font-bold uppercase tracking-widest text-xs">Currently Lent Out</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm p-8 md:p-10">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3">
+                <i class="fa-solid fa-layer-group text-emerald-500"></i> My Books
+            </h3>
+            <span class="bg-slate-100 px-4 py-1 rounded-full text-xs font-black text-slate-500">{{ my_books|length }} TOTAL</span>
+        </div>
+
+        {% if my_books %}
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {% for book in my_books %}
+                <a href="{% url 'book_detail' book.id %}" class="group block">
+                    <div class="aspect-[3/4] rounded-2xl overflow-hidden border border-slate-100 shadow-sm group-hover:shadow-md transition-all relative">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ book.title }}">
+                        {% else %}
+                            <div class="w-full h-full bg-slate-50 flex items-center justify-center text-slate-200 text-3xl">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                        {% endif %}
+                        
+                        {% if not book.available %}
+                            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center">
+                                <span class="bg-white text-slate-900 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Lent Out</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <p class="mt-3 text-sm font-bold text-slate-900 truncate">{{ book.title }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <p class="text-slate-400 font-medium">You haven't added any books yet.</p>
+                <a href="{% url 'add_book' %}" class="inline-block mt-4 text-emerald-600 font-black text-sm hover:underline">+ Add Your First Book</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

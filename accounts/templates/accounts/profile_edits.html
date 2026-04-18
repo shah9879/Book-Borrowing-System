@@ -1,60 +1,108 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}Edit Profile | BookShare{% endblock %}
 
-<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <h2>✏️ Edit Profile</h2>
-    
-    <form method="POST">
-        {% csrf_token %}
-        
-        <!-- User Information Section -->
-        <div style="margin-bottom: 30px;">
-            <h3 style="border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Account Information</h3>
-            {{ user_form.as_p }}
-        </div>
-        
-        <!-- City Section -->
-        <div style="margin-bottom: 30px;">
-            <h3 style="border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Location</h3>
-            {{ profile_form.as_p }}
-        </div>
-        
-        <!-- Buttons -->
-        <div style="display: flex; gap: 10px;">
-            <button type="submit" style="flex: 1; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                ✓ Save Changes
-            </button>
-            <a href="{% url 'profile' %}" style="flex: 1; padding: 12px; background: #9E9E9E; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
-                Cancel
-            </a>
-        </div>
-    </form>
+{% block content %}
+<div class="max-w-2xl mx-auto px-4">
+    <div class="mb-8 text-center md:text-left">
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Edit Profile</h1>
+        <p class="text-slate-500 mt-2 font-medium">Update your account details and local visibility.</p>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+        <form method="POST" class="p-8 md:p-12 space-y-10">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 border-b-2 border-emerald-500 pb-3">
+                    <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+                        <i class="fa-solid fa-user-gear text-sm"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-wider">Account Information</h3>
+                </div>
+                
+                <div class="django-form-wrapper">
+                    {{ user_form.as_p }}
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 border-b-2 border-emerald-500 pb-3">
+                    <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+                        <i class="fa-solid fa-map-location-dot text-sm"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-wider">Location Settings</h3>
+                </div>
+                
+                <div class="django-form-wrapper">
+                    {{ profile_form.as_p }}
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
+                <button type="submit" 
+                        class="flex-[2] bg-emerald-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Changes
+                </button>
+                <a href="{% url 'profile' %}" 
+                   class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold text-center hover:bg-slate-200 hover:text-slate-700 transition-all">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <style>
-    input[type="text"], 
-    input[type="email"] {
+    .django-form-wrapper p {
+        margin-bottom: 1.5rem;
+    }
+
+    .django-form-wrapper label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #475569; /* slate-600 */
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .django-form-wrapper input[type="text"],
+    .django-form-wrapper input[type="email"],
+    .django-form-wrapper input[type="password"],
+    .django-form-wrapper select {
         width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
+        padding: 0.875rem 1rem;
+        background-color: #f8fafc; /* slate-50 */
+        border: 1px solid #e2e8f0; /* slate-200 */
+        border-radius: 1rem;
+        font-size: 1rem;
+        transition: all 0.2s;
+        outline: none;
     }
-    
-    label {
+
+    .django-form-wrapper input:focus {
+        background-color: white;
+        border-color: #10b981; /* emerald-500 */
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .django-form-wrapper .helptext {
         display: block;
-        margin-bottom: 5px;
+        font-size: 0.75rem;
+        color: #94a3b8; /* slate-400 */
+        margin-top: 0.4rem;
+        line-height: 1.4;
+    }
+
+    /* Target Django's error list if validation fails */
+    .errorlist {
+        color: #ef4444;
+        font-size: 0.75rem;
         font-weight: bold;
-        color: #333;
-    }
-    
-    .helptext {
-        display: block;
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
+        margin-bottom: 0.5rem;
+        list-style: none;
     }
 </style>
-
 {% endblock %}

@@ -1,11 +1,117 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}Join BookShare | Create Account{% endblock %}
 
-<h2>Register</h2>
-<form method="POST">
-	{% csrf_token %}
-	{{ form.as_p }}
-	<button type="submit">Sign Up</button>
-</form>
-<p>Already have an account? <a href=" {% url 'login' %}">>Login</a> </p>
+{% block content %}
+<div class="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
+    <div class="w-full max-w-lg bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden">
+        
+        <div class="bg-emerald-600 p-8 text-center text-white relative">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/30">
+                <i class="fa-solid fa-user-plus text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-black tracking-tight">Create Account</h2>
+            <p class="text-emerald-100 text-sm font-medium mt-1">Start your journey in our book-sharing community</p>
+            
+            <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] transform rotate-180">
+                <svg class="relative block w-full h-[20px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M1200 120L0 16.48V0h1200v120z" class="fill-white"></path>
+                </svg>
+            </div>
+        </div>
+
+        <form method="POST" class="p-8 md:p-10">
+            {% csrf_token %}
+
+            <div class="django-form-wrapper space-y-1">
+                {{ form.as_p }}
+            </div>
+
+            <div class="mt-8">
+                <button type="submit" 
+                        class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3">
+                    <span>Create My Account</span>
+                    <i class="fa-solid fa-circle-check"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="bg-slate-50 p-6 text-center border-t border-slate-100">
+            <p class="text-slate-500 text-sm font-medium">
+                Already have an account? 
+                <a href="{% url 'login' %}" class="text-emerald-600 font-bold hover:underline ml-1">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <p class="mt-8 text-slate-400 text-[10px] uppercase tracking-[0.2em] font-black flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved"></i> Secure Community Registration
+    </p>
+</div>
+
+<style>
+    .django-form-wrapper p {
+        margin-bottom: 1.25rem;
+    }
+
+    .django-form-wrapper label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.75rem;
+        color: #64748b; /* slate-500 */
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .django-form-wrapper input {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        background-color: #f8fafc; /* slate-50 */
+        border: 1px solid #e2e8f0; /* slate-200 */
+        border-radius: 1rem;
+        font-size: 1rem;
+        transition: all 0.2s;
+        outline: none;
+    }
+
+    .django-form-wrapper input:focus {
+        background-color: white;
+        border-color: #10b981; /* emerald-500 */
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    /* Styling for the password requirements text Django usually provides */
+    .django-form-wrapper .helptext {
+        display: block;
+        font-size: 11px;
+        color: #94a3b8;
+        line-height: 1.4;
+        margin-top: 6px;
+        padding-left: 4px;
+    }
+
+    .django-form-wrapper ul {
+        list-style: none;
+        padding: 0;
+        margin: 4px 0 0 0;
+    }
+
+    .django-form-wrapper li {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-bottom: 2px;
+    }
+
+    /* Error Handling */
+    .errorlist {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        padding: 10px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        color: #ef4444;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
 {% endblock %}

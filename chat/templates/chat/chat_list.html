@@ -1,52 +1,88 @@
 {% extends 'base.html' %}
+{% block title %}Messages | BookShare{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <h2>My Conversations</h2>
-    
+<div class="max-w-3xl mx-auto px-4">
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">My Conversations</h1>
+            <p class="text-slate-500 font-medium">Connect with fellow readers in your area.</p>
+        </div>
+        <div class="bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-100">
+            <span class="text-xs font-black text-emerald-600 uppercase tracking-widest">
+                {{ chat_data|length }} active threads
+            </span>
+        </div>
+    </div>
+
     {% if chat_data %}
-        <!-- Loop through all your chats -->
-        {% for item in chat_data %}
-        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; background: white;">
-            
-            <!-- Book info -->
-            <h3>{{ item.chat.book.title }}</h3>
-            <p><strong>Chatting with:</strong> {{ item.other_user.username }}</p>
-            
-            <!-- Last message preview -->
-            {% if item.last_message %}
-                <p style="color: #666;">
-                    <strong>{{ item.last_message.sender.username }}:</strong> 
-                    {{ item.last_message.content|truncatewords:10 }}
-                    <!-- truncatewords:10 means show only first 10 words -->
-                </p>
-                <p style="font-size: 12px; color: #999;">
-                    {{ item.last_message.timestamp|date:"M d, Y H:i" }}
-                    <!-- Shows date like "Nov 12, 2025 14:30" -->
-                </p>
-            {% endif %}
-            
-            <!-- Unread badge (like WhatsApp red circle) -->
-            {% if item.unread_count > 0 %}
-                <span style="background: red; color: white; padding: 5px 10px; border-radius: 50%; font-size: 12px;">
-                    {{ item.unread_count }} new
-                </span>
-            {% endif %}
-            
-            <!-- Button to open the chat -->
-            <a href="{% url 'chat_detail' item.chat.id %}">
-                <button style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                    Open Chat
-                </button>
+        <div class="space-y-4">
+            {% for item in chat_data %}
+            <a href="{% url 'chat_detail' item.chat.id %}" class="block group">
+                <div class="bg-white rounded-[2rem] border border-slate-200 p-6 flex items-center gap-6 transition-all group-hover:shadow-xl group-hover:shadow-emerald-100 group-hover:border-emerald-200 group-hover:-translate-y-1">
+                    
+                    <div class="w-16 h-20 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-100 relative shadow-sm">
+                        {% if item.chat.book.cover_image %}
+                            <img src="{{ item.chat.book.cover_image.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                        {% endif %}
+                        
+                        {% if item.unread_count > 0 %}
+                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-white rounded-full"></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-black text-slate-900 truncate pr-4 text-lg">{{ item.chat.book.title }}</h3>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0 mt-1">
+                                {{ item.last_message.timestamp|date:"M d" }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-bold text-slate-400">with</span>
+                            <span class="text-xs font-black text-emerald-600">{{ item.other_user.username }}</span>
+                        </div>
+
+                        {% if item.last_message %}
+                            <p class="text-sm text-slate-500 truncate italic">
+                                <span class="font-bold not-italic">
+                                    {% if item.last_message.sender == request.user %}You:{% else %}{{ item.other_user.username }}:{% endif %}
+                                </span> 
+                                "{{ item.last_message.content|truncatewords:8 }}"
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex flex-col items-end gap-3 shrink-0 ml-2">
+                        {% if item.unread_count > 0 %}
+                            <span class="bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg shadow-red-100 animate-pulse">
+                                {{ item.unread_count }} NEW
+                            </span>
+                        {% endif %}
+                        <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-inner">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white rounded-[3rem] border-2 border-dashed border-slate-200 p-12 text-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
+                <i class="fa-solid fa-comments text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-900">No messages yet</h3>
+            <p class="text-slate-500 font-medium mt-2">Browse books to start a conversation with owners.</p>
+            <a href="{% url 'browse_books' %}" class="inline-block mt-6 bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm hover:bg-emerald-600 transition-all">
+                Find Books
             </a>
         </div>
-        {% endfor %}
-    {% else %}
-        <!-- If no chats exist -->
-        <p>No conversations yet. Browse books and request to borrow one!</p>
-        <a href="{% url 'browse_books' %}">
-            <button>Browse Books</button>
-        </a>
-    {% endif %}
+    {% endif %} 
 </div>
 {% endblock %}

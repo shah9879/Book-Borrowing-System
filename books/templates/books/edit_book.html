@@ -1,59 +1,105 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}Edit: {{ book.title }} | BookShare{% endblock %}
 
-<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <h2>✏️ Edit Book: {{ book.title }}</h2>
-    
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <div style="margin-bottom: 20px;">
-            {{ form.as_p }}
-        </div>
-        
-        <!-- Show current cover if exists -->
-        {% if book.cover_image %}
-            <div style="margin-bottom: 20px;">
-                <p><strong>Current Cover:</strong></p>
-                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="max-width: 200px; border: 1px solid #ddd; border-radius: 5px;">
-                <p style="font-size: 12px; color: #666;">Upload a new image to replace it</p>
+{% block content %}
+<div class="max-w-3xl mx-auto px-4">
+    <div class="mb-8">
+        <nav class="flex mb-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <a href="{% url 'my_books' %}" class="hover:text-emerald-600 transition-colors">My Books</a>
+            <span class="mx-2 text-slate-300">/</span>
+            <span class="text-slate-900">Edit Listing</span>
+        </nav>
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">✏️ Edit Book</h1>
+        <p class="text-slate-500 font-medium">Updating details for <span class="italic text-slate-800">"{{ book.title }}"</span></p>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+        <form method="POST" enctype="multipart/form-data" class="p-8 md:p-12">
+            {% csrf_token %}
+
+            <div class="space-y-8">
+                {% if book.cover_image or book.cover_url %}
+                <div class="flex flex-col sm:flex-row items-center gap-6 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="w-24 h-32 bg-white rounded-xl overflow-hidden border border-slate-200 shrink-0 shadow-md">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+                        {% elif book.cover_url %}
+                            <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+                        {% endif %}
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <h4 class="font-bold text-slate-900 text-sm uppercase tracking-wider mb-1">Current Cover Image</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed max-w-[200px]">
+                            Upload a new file or provide a new URL below to replace the existing cover.
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="django-form-wrapper">
+                    {{ form.as_p }}
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-4">
+                    <button type="submit" 
+                            class="w-full sm:w-auto bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-emerald-200 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-check-double"></i>
+                        Update Book
+                    </button>
+                    <a href="{% url 'my_books' %}" class="px-8 py-4 text-slate-400 font-bold hover:text-slate-600 transition-colors text-center">
+                        Cancel
+                    </a>
+                </div>
             </div>
-        {% elif book.cover_url %}
-            <div style="margin-bottom: 20px;">
-                <p><strong>Current Cover (URL):</strong></p>
-                <img src="{{ book.cover_url }}" alt="{{ book.title }}" style="max-width: 200px; border: 1px solid #ddd; border-radius: 5px;">
-            </div>
-        {% endif %}
-        
-        <button type="submit" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">
-            ✓ Update Book
-        </button>
-    </form>
-    
-    <br>
-    <a href="{% url 'my_books' %}">← Back to My Books</a>
+        </form>
+    </div>
 </div>
 
 <style>
-    input[type="text"], 
-    input[type="url"], 
-    input[type="file"], 
-    textarea, 
-    select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
+    /* Scoped styling for Django's raw .as_p output */
+    .django-form-wrapper p {
+        margin-bottom: 1.5rem;
     }
-    
-    label {
+
+    .django-form-wrapper label {
         display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #333;
+        font-weight: 800;
+        font-size: 0.75rem;
+        color: #64748b; /* slate-500 */
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .django-form-wrapper input[type="text"],
+    .django-form-wrapper input[type="url"],
+    .django-form-wrapper input[type="file"],
+    .django-form-wrapper textarea,
+    .django-form-wrapper select {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background-color: #f8fafc; /* slate-50 */
+        border: 2px solid #f1f5f9; /* slate-100 */
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .django-form-wrapper input:focus, 
+    .django-form-wrapper textarea:focus {
+        outline: none;
+        background-color: white;
+        border-color: #10b981; /* emerald-500 */
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+    }
+
+    .django-form-wrapper input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: #10b981;
+        margin-right: 0.5rem;
+        vertical-align: middle;
     }
 </style>
-
 {% endblock %}

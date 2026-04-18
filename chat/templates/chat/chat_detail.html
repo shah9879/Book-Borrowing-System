@@ -1,121 +1,112 @@
 {% extends 'base.html' %}
+{% block title %}Chat with {{ other_user.username }} | BookShare{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
+<div class="max-w-4xl mx-auto h-[85vh] flex flex-col">
     
-    <!-- Header showing book and who you're talking to -->
-    <div style="background: #4CAF50; color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-        <h3>{{ chat.book.title }}</h3>
-        <p>Chatting with: <strong>{{ other_user.username }}</strong></p>
-        <p style="font-size: 14px;">{{ other_user.profile.city }}</p>
-        
-        <!-- Book Status Badge -->
+    <div class="bg-white rounded-t-[2rem] border-x border-t border-slate-200 p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-16 bg-slate-100 rounded-lg overflow-hidden border border-slate-100 hidden sm:block">
+                    {% if chat.book.cover_image %}
+                        <img src="{{ chat.book.cover_image.url }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fa-solid fa-book"></i></div>
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="font-black text-slate-900 leading-tight">{{ chat.book.title }}</h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-xs font-bold text-slate-400">Chatting with</span>
+                        <span class="text-xs font-black text-emerald-600 px-2 py-0.5 bg-emerald-50 rounded-md">{{ other_user.username }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                {% if chat.book.available %}
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-wider">
+                        <i class="fa-solid fa-circle-check text-[10px]"></i> Book Available
+                    </span>
+                {% else %}
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-xs font-black uppercase tracking-wider">
+                        <i class="fa-solid fa-handshake text-[10px]"></i> Currently Borrowed
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if is_owner %}
+    <div class="bg-slate-50 border-x border-slate-200 p-4">
         {% if chat.book.available %}
-            <span style="background: rgba(255,255,255,0.3); padding: 5px 10px; border-radius: 5px; font-size: 13px;">
-                ✓ Book Available
-            </span>
+            <div class="bg-white border-2 border-emerald-100 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-sm font-bold text-slate-600"><span class="text-emerald-500">💡 Tip:</span> Ready to lend this book to {{ other_user.username }}?</p>
+                <form method="POST" class="w-full sm:w-auto">
+                    {% csrf_token %}
+                    <button type="submit" name="confirm_borrow" 
+                            class="w-full bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-black text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
+                            onclick="return confirm('Confirm borrowing to {{ other_user.username }}?');">
+                        ✅ Confirm Borrowing
+                    </button>
+                </form>
+            </div>
         {% else %}
-            <span style="background: rgba(255,0,0,0.7); padding: 5px 10px; border-radius: 5px; font-size: 13px;">
-                ⚠️ Currently Borrowed
-            </span>
+            <div class="bg-white border-2 border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-sm font-bold text-slate-600">The book is currently marked as lent out.</p>
+                <a href="{% url 'return_book' chat.book.id %}" 
+                   class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-xl font-black text-sm hover:bg-blue-700 transition-all text-center">
+                    ↩️ Mark as Returned
+                </a>
+            </div>
         {% endif %}
     </div>
-    
-    <!-- Confirm Borrowing Button (Only for owner, only if book available) -->
-    {% if is_owner and chat.book.available %}
-    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
-        <p style="margin: 0 0 10px 0;"><strong>⚠️ Owner Action:</strong> Once you've agreed to lend this book, click below to confirm.</p>
-        <form method="POST" style="display: inline;">
+    {% endif %}
+
+    <div id="messages-container" class="flex-1 bg-slate-50 border-x border-slate-200 overflow-y-auto p-6 space-y-4">
+        {% for message in messages %}
+            <div class="flex flex-col {% if message.sender == request.user %}items-end{% else %}items-start{% endif %}">
+                <div class="max-w-[80%] md:max-w-[70%] relative group">
+                    <div class="p-4 rounded-[2rem] text-sm font-medium shadow-sm 
+                        {% if message.sender == request.user %}
+                            bg-emerald-600 text-white rounded-tr-none
+                        {% else %}
+                            bg-white text-slate-700 border border-slate-100 rounded-tl-none
+                        {% endif %}">
+                        
+                        {% if message.sender != request.user %}
+                            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1 opacity-70">
+                                {{ message.sender.username }}
+                            </p>
+                        {% endif %}
+                        
+                        <p class="leading-relaxed">{{ message.content }}</p>
+                    </div>
+                    <p class="text-[9px] mt-1 font-bold text-slate-400 {% if message.sender == request.user %}text-right mr-2{% else %}ml-2{% endif %}">
+                        {{ message.timestamp|date:"g:i A" }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="bg-white rounded-b-[2rem] border-x border-b border-slate-200 p-6 shadow-sm">
+        <form method="POST" class="flex gap-3">
             {% csrf_token %}
-            <button type="submit" name="confirm_borrow" 
-                    style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;"
-                    onclick="return confirm('Are you sure you want to confirm this borrowing?');">
-                ✅ Confirm Borrowing
+            <input type="text" name="content" placeholder="Type your message here..." required 
+                   class="flex-1 bg-slate-100 border-none focus:ring-2 focus:ring-emerald-500 rounded-2xl px-6 py-4 text-sm font-medium transition-all">
+            <button type="submit" class="bg-emerald-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-emerald-700 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-200">
+                <i class="fa-solid fa-paper-plane"></i>
             </button>
         </form>
     </div>
-    {% endif %}
-    
-    <!-- Return Book Button (Only for owner, only if book borrowed) -->
-    {% if is_owner and not chat.book.available %}
-    <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #28a745;">
-        <p style="margin: 0 0 10px 0;"><strong>Book Borrowed:</strong> When the book is returned, mark it as available again.</p>
-        <a href="{% url 'return_book' chat.book.id %}" 
-           style="display: inline-block; background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-            ↩️ Mark as Returned
-        </a>
-    </div>
-    {% endif %}
-    
-    <!-- Messages container -->
-    <div id="messages-container" style="background: #f5f5f5; padding: 20px; border-radius: 5px; min-height: 400px; max-height: 500px; overflow-y: auto; margin-bottom: 20px;">
-        
-        {% for message in messages %}
-        <div style="margin-bottom: 15px; 
-                    {% if message.sender == request.user %}
-                        text-align: right;
-                    {% else %}
-                        text-align: left;
-                    {% endif %}">
-            
-            <!-- Message bubble -->
-            <div style="display: inline-block; 
-                        max-width: 70%; 
-                        padding: 10px 15px; 
-                        border-radius: 15px;
-                        {% if message.sender == request.user %}
-                            background: #4CAF50; color: white;
-                        {% else %}
-                            background: white; color: black; border: 1px solid #ddd;
-                        {% endif %}">
-                
-                {% if message.sender != request.user %}
-                    <strong style="font-size: 12px; color: #666;">{{ message.sender.username }}</strong><br>
-                {% endif %}
-                
-                <p style="margin: 5px 0;">{{ message.content }}</p>
-                
-                <span style="font-size: 11px; 
-                            {% if message.sender == request.user %}
-                                color: #e0e0e0;
-                            {% else %}
-                                color: #999;
-                            {% endif %}">
-                    {{ message.timestamp|date:"M d, H:i" }}
-                </span>
-            </div>
-        </div>
-        {% endfor %}
-        
-    </div>
-    
-    <!-- Send message form -->
-    <form method="POST" style="display: flex; gap: 10px;">
-        {% csrf_token %}
-        
-        <input type="text" 
-               name="content" 
-               placeholder="Type your message..." 
-               required 
-               style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
-        
-        <button type="submit" 
-                style="background: #4CAF50; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-            Send
-        </button>
-    </form>
-    
-    <br>
-    <a href="{% url 'chat_list' %}">← Back to Conversations</a>
-    
 </div>
 
-<!-- Auto-scroll to bottom -->
 <script>
-    const messagesDiv = document.getElementById('messages-container');
-    if (messagesDiv) {
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    // Auto-scroll to latest message
+    const container = document.getElementById('messages-container');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
     }
 </script>
-
 {% endblock %}
