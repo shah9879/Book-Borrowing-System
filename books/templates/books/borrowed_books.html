@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="max-width: 1200px; margin: 0 auto;">
+    <h2>📖 Books I'm Borrowing</h2>
+    
+    <p style="color: #666; margin-bottom: 20px;">
+        You are currently borrowing <strong>{{ borrowed_list|length }}</strong> book(s)
+    </p>
+    
+    <!-- Books Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        {% for item in borrowed_list %}
+        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            
+            <!-- Book Cover -->
+            <div style="width: 100%; height: 200px; background: #f0f0f0; border-radius: 5px; overflow: hidden; margin-bottom: 15px;">
+                {% if item.book.cover_image %}
+                    <img src="{{ item.book.cover_image.url }}" alt="{{ item.book.title }}" style="width: 100%; height: 100%; object-fit: contain;">
+                {% elif item.book.cover_url %}
+                    <img src="{{ item.book.cover_url }}" alt="{{ item.book.title }}" style="width: 100%; height: 100%; object-fit: contain;">
+                {% else %}
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                        <span style="font-size: 60px;">📖</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Book Details -->
+            <h3 style="margin: 0 0 10px 0;">{{ item.book.title }}</h3>
+            <p style="margin: 5px 0; color: #666;"><strong>Author:</strong> {{ item.book.author }}</p>
+            <p style="margin: 5px 0; color: #666;"><strong>Owner:</strong> 👤 {{ item.owner.username }}</p>
+            <p style="margin: 5px 0; color: #666;"><strong>City:</strong> 📍 {{ item.book.city }}</p>
+            
+            <!-- Status Badge -->
+            <p style="margin: 10px 0;">
+                {% if item.book.available %}
+                    <span style="background: #4CAF50; color: white; padding: 5px 12px; border-radius: 5px; font-size: 13px;">✓ Available to Return</span>
+                {% else %}
+                    <span style="background: #FF9800; color: white; padding: 5px 12px; border-radius: 5px; font-size: 13px;">📚 Currently Borrowed</span>
+                {% endif %}
+            </p>
+            
+            <!-- Action Buttons -->
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <a href="{% url 'chat_detail' item.chat.id %}" 
+                   style="flex: 1; text-align: center; padding: 10px; background: #2196F3; color: white; text-decoration: none; border-radius: 5px;">
+                    💬 Message Owner
+                </a>
+                <a href="{% url 'return_book' item.book.id %}" 
+                   style="flex: 1; text-align: center; padding: 10px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+                    ↩️ Mark as Returned
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 8px;">
+            <p style="font-size: 18px; color: #666;">📚 You're not borrowing any books currently.</p>
+            <a href="{% url 'browse_books' %}" 
+               style="display: inline-block; margin-top: 15px; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+                Browse Books
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

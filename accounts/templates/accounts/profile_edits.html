@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h2>✏️ Edit Profile</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- User Information Section -->
+        <div style="margin-bottom: 30px;">
+            <h3 style="border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Account Information</h3>
+            {{ user_form.as_p }}
+        </div>
+        
+        <!-- City Section -->
+        <div style="margin-bottom: 30px;">
+            <h3 style="border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Location</h3>
+            {{ profile_form.as_p }}
+        </div>
+        
+        <!-- Buttons -->
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" style="flex: 1; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                ✓ Save Changes
+            </button>
+            <a href="{% url 'profile' %}" style="flex: 1; padding: 12px; background: #9E9E9E; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input[type="text"], 
+    input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .helptext {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+</style>
+
+{% endblock %}

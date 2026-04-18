@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Books</h2>
+
+{% for book in books %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+        <h3>{{ book.title }}</h3>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>City:</strong> {{ book.city }}</p>
+        <p><strong>Available:</strong> {{ book.available }}</p>
+    </div>
+{% empty %}
+    <p>You haven't added any books yet.</p>
+{% endfor %}
+{% endblock %}

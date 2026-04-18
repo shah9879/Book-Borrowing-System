@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; ">
+	<h2>{{ book.title }}</h2>
+
+	{% if book.cover_image %}
+		<img src=" {{ book.cover_image.url }}" alt="{{book.title}}" style="max-width: 300px; height:auto;">
+	{% elif book.cover_url %} 
+		<img src="{{ book.cover_url }}" alt="{{ book.title }}" style="max-width: 300px; height: auto;">
+	{% endif %}
+
+	<p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+    <p><strong>Description:</strong> {{ book.description }}</p>
+    <p><strong>City:</strong> {{ book.city }}</p>
+    <p><strong>Delivery Option:</strong> {{ book.get_delivery_option_display }}</p>
+    <p><strong>Owner:</strong> {{ book.owner.username }}</p>
+    <p ><strong>Available:</strong> {% if book.available %}Yes{% else %}No{% endif %}</p>
+
+    <hr>
+
+    {% if book.owner == request.user %}
+    	<p><em>This is your book</em></p>
+    	<a href="{% url 'my_books' %}">Back to My Books</a>
+    {% elif not book.available %}
+    	<p><em>This book is currently unavailable</em></p>
+    {% elif existing_request %}
+        <p><em>You've already requested this book. Status: {{ existing_request.status }}</em></p>
+    {% else %}
+        <a href="{% url 'request_borrow' book.id %}">
+            <button>Request to Borrow</button>
+        </a>
+    {% endif %}
+    
+    <br><br>
+    <a href="{% url 'browse_books' %}">Back to Browse</a>
+</div>
+{% endblock %}

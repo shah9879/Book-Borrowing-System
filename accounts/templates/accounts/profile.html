@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="max-width: 1000px; margin: 0 auto;">
+    
+    <!-- Profile Header -->
+    <div style="background: white; border-radius: 8px; padding: 30px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <h2 style="margin: 0 0 10px 0;">👤 {{ request.user.username }}</h2>
+                {% if request.user.first_name %}
+                    <p style="font-size: 18px; color: #666; margin: 5px 0;">{{ request.user.first_name }} {{ request.user.last_name }}</p>
+                {% endif %}
+                <p style="color: #666; margin: 5px 0;">📧 {{ request.user.email }}</p>
+                {% if request.user.profile.city %}
+                    <p style="color: #666; margin: 5px 0;">📍 {{ request.user.profile.city }}</p>
+                {% endif %}
+                <p style="color: #999; margin-top: 10px; font-size: 14px;">Member since {{ request.user.date_joined|date:"M Y" }}</p>
+            </div>
+            <a href="{% url 'profile_edit' %}" 
+               style="background: #FF9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                ✏️ Edit Profile
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+        <div style="background: #4CAF50; color: white; padding: 20px; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 36px;">{{ my_books|length }}</h3>
+            <p style="margin: 5px 0;">Books Owned</p>
+        </div>
+        <div style="background: #2196F3; color: white; padding: 20px; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 36px;">{{ borrowed_books|length }}</h3>
+            <p style="margin: 5px 0;">Currently Borrowing</p>
+        </div>
+        <div style="background: #FF9800; color: white; padding: 20px; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 36px;">{{ lent_books|length }}</h3>
+            <p style="margin: 5px 0;">Currently Lent Out</p>
+        </div>
+    </div>
+    
+    <!-- My Books Section -->
+    <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3>📚 My Books ({{ my_books|length }})</h3>
+        {% if my_books %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                {% for book in my_books %}
+                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;">
+                    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; text-align: center;">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px;">
+                        {% else %}
+                            <div style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 5px; margin-bottom: 10px;">
+                                <span style="font-size: 40px;">📖</span>
+                            </div>
+                        {% endif %}
+                        <p style="margin: 0; font-size: 14px; font-weight: bold;">{{ book.title|truncatewords:3 }}</p>
+                        {% if not book.available %}
+                            <span style="background: #f44336; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">Lent Out</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #999;">You haven't added any books yet.</p>
+            <a href="{% url 'add_book' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Add Your First Book</a>
+        {% endif %}
+    </div>
+    
+    <!-- Currently Borrowing Section -->
+    <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3>📖 Currently Borrowing ({{ borrowed_books|length }})</h3>
+        {% if borrowed_books %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                {% for book in borrowed_books %}
+                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit;">
+                    <div style="border: 1px solid #ddd; border-radius: 5px; padding: 10px; text-align: center;">
+                        {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px;">
+                        {% else %}
+                            <div style="height: 120px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 5px; margin-bottom: 10px;">
+                                <span style="font-size: 40px;">📖</span>
+                            </div>
+                        {% endif %}
+                        <p style="margin: 0; font-size: 14px; font-weight: bold;">{{ book.title|truncatewords:3 }}</p>
+                        <p style="margin: 5px 0; font-size: 12px; color: #666;">by {{ book.owner.username }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #999;">You're not borrowing any books currently.</p>
+            <a href="{% url 'browse_books' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Browse Books</a>
+        {% endif %}
+    </div>
+    
+</div>
+
+{% endblock %}
